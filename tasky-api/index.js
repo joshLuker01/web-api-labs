@@ -4,6 +4,9 @@ dotenv.config();
 import express from 'express';
 import tasksRouter from './api/tasks';
 import { connectDB } from './db';
+// other imports
+import cors from 'cors';
+
 
 
 const errHandler = (err, req, res, next) => {
@@ -18,6 +21,10 @@ const errHandler = (err, req, res, next) => {
 
 const app = express();
 const port = process.env.PORT;
+// Enable CORS for all requests
+app.use(cors());
+
+
 
 app.use(express.static('public'));
 app.use(express.json());
