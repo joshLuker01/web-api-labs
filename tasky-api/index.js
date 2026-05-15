@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import authenticate from './authenticate/index.js';
 dotenv.config();
 
 import express from 'express';
@@ -19,7 +20,7 @@ app.get('/', (req, res) => {
   res.send('Tasky API is running');
 });
 
-app.use('/api/tasks', tasksRouter);
+app.use('/api/tasks', authenticate, tasksRouter);
 app.use('/api/users', usersRouter);
 
 app.use((req, res) => {
