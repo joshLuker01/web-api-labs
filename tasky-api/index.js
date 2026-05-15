@@ -2,45 +2,45 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import express from 'express';
-import tasksRouter from './api/tasks';
-import { connectDB } from './db';
-// other imports
 import cors from 'cors';
-//... other imports
+
+import { connectDB } from './db/index.js';
+import tasksRouter from './api/tasks/index.js';
 import usersRouter from './api/users/index.js';
 
-
-
-
-const errHandler = (err, req, res, next) => {
-  /* if the error in development then send stack trace to display whole error,
-  if it's in production then just send error message  */
-  if(process.env.NODE_ENV === 'production') {
-    return res.status(500).send(`Something went wrong!`);
-  }
-  res.status(500).send(`Hey!! You caught the error 👍👍. Here's the details: ${err.stack} `);
-};
-
-
 const app = express();
-const port = process.env.PORT;
-// Enable CORS for all requests
+const port = process.env.PORT || 8080;
+
 app.use(cors());
-
-
-
-app.use(express.static('public'));
 app.use(express.json());
+app.use(express.static('public'));
+
+app.get('/', (req, res) => {
+  res.send('Tasky API is running');
+});
+
 app.use('/api/tasks', tasksRouter);
-//Users router
 app.use('/api/users', usersRouter);
 
+app.use((req, res) => {
+  res.status(404).json({
+    code: 404,
+    msg: `Route not found: ${req.method} ${req.originalUrl}`,
+  });
+});
 
-app.use(errHandler);
+app.use((err, req, res, next) => {
+  console.error(err);
 
+  res.status(500).json({
+    code: 500,
+    msg: 'Something went wrong',
+    error: process.env.NODE_ENV === 'production' ? undefined : err.message,
+  });
+});
 
 connectDB();
 
 app.listen(port, () => {
-  console.info(`Server running at ${port}`);
+  console.info(`Server running at http://localhost:${port}`);
 });
